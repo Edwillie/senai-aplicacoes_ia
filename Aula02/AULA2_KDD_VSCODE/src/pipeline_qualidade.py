@@ -171,15 +171,15 @@ def etapa_3_transformacao(prata: pd.DataFrame):
     atributos = prata.drop(columns=["id_lote", "resultado_inspecao"])
     X = pd.get_dummies(
         atributos,
-        # aqui é com voce!!!
+        columns=["linha", "turno", "fornecedor"], # aqui é com voce!!!
         drop_first=False,
         dtype=int,
     )
 
     X_train, X_test, y_train, y_test = train_test_split(
-        # aqui é com voce!!!
-        # aqui é com voce!!!
-        # aqui é com voce!!!
+        X, # aqui é com voce!!!
+        y, # aqui é com voce!!!
+        test_size=0.25, # aqui é com voce!!!
         stratify=y,
     )
 
@@ -198,8 +198,8 @@ def etapa_4_mineracao(X_train, X_test, y_train):
     titulo("KDD 4 — MINERAÇÃO / ÁRVORE DE DECISÃO")
 
     modelo = DecisionTreeClassifier(
-        # aqui é com voce!!!
-        # aqui é com voce!!!
+        max_depth=3, # aqui é com voce!!!
+        random_state=42 # aqui é com voce!!!
     )
     modelo.fit(X_train, y_train)
     y_pred = modelo.predict(X_test)
