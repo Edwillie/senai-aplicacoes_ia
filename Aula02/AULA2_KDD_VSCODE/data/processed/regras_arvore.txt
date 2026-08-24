@@ -1,16 +1,10 @@
-|--- tempo_ciclo_s <= 46.95
-|   |--- pressao_bar <= 5.95
-|   |   |--- class: 1
-|   |--- pressao_bar >  5.95
-|   |   |--- temp_forno_c <= 196.00
-|   |   |   |--- class: 0
-|   |   |--- temp_forno_c >  196.00
+|--- tempo_ciclo_s <= 51.60
+|   |--- temp_forno_c <= 198.25
+|   |   |--- pressao_bar <= 5.95
 |   |   |   |--- class: 1
-|--- tempo_ciclo_s >  46.95
-|   |--- temp_forno_c <= 189.35
-|   |   |--- tempo_ciclo_s <= 52.10
+|   |   |--- pressao_bar >  5.95
 |   |   |   |--- class: 0
-|   |   |--- tempo_ciclo_s >  52.10
-|   |   |   |--- class: 1
-|   |--- temp_forno_c >  189.35
+|   |--- temp_forno_c >  198.25
 |   |   |--- class: 1
+|--- tempo_ciclo_s >  51.60
+|   |--- class: 1

@@ -1,6 +1,6 @@
 ﻿metrica,valor
-acuracia,0.9166666666666666
+acuracia,0.75
 falso_positivo,1.0
-falso_negativo,1.0
-verdadeiro_negativo,15.0
-verdadeiro_positivo,7.0
+falso_negativo,5.0
+verdadeiro_negativo,14.0
+verdadeiro_positivo,4.0
