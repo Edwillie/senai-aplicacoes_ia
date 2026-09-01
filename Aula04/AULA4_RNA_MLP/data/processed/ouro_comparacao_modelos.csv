@@ -1,0 +1,4 @@
+﻿modelo,acuracia,falso_positivo,falso_negativo
+Árvore de Decisão,0.9166666666666666,1,1
+MLP TensorFlow/Keras,0.75,3,3
+MLP scikit-learn,0.7083333333333334,3,4

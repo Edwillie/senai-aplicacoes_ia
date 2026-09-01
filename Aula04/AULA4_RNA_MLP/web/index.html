@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Guia interativo da Aula 02 - KDD e Pipeline de Dados com VS Code">
+  <title>Aula 02 | KDD e Pipeline de Dados</title>
+  <link rel="stylesheet" href="guia_kdd.css">
+</head>
+<body>
+  <div class="brand-rail" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">SENAI-SP</div>
+      <div class="brand-copy">
+        <strong>Aplicações em Inteligência Artificial</strong>
+        <span>Aula 02 | KDD e Pipeline de Dados com VS Code</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <!-- <button class="btn btn-ghost" id="open-streamlit" type="button">Abrir painel Streamlit</button> -->
+      <button class="btn btn-primary" id="run-tour" type="button">Percorrer o pipeline</button>
+    </div>
+  </header>
+
+  <aside class="sidebar" aria-label="Navegação principal">
+    <div class="sidebar-inner">
+      <div class="progress-box">
+        <span class="eyebrow">PROGRESSO</span>
+        <div class="progress-track">
+          <div class="progress-fill" id="page-progress"></div>
+        </div>
+        <span id="progress-label">0%</span>
+      </div>
+
+      <nav class="nav-list">
+        <a href="#inicio" class="nav-link active">Visão geral</a>
+        <a href="#camadas" class="nav-link">Bronze, Prata e Ouro</a>
+        <a href="#ambiente" class="nav-link">Preparar o ambiente</a>
+        <a href="#dataset" class="nav-link">Conhecer os dados</a>
+        <a href="#kdd" class="nav-link">Etapas do KDD</a>
+        <a href="#modelo" class="nav-link">Modelo e avaliação</a>
+        <a href="#matriz" class="nav-link">Matriz de confusão</a>
+        <a href="#ouro" class="nav-link">Camada Ouro</a>
+        <a href="#desafio" class="nav-link">Desafio e fechamento</a>
+      </nav>
+
+      <div class="data-status" id="data-status">
+        <span class="status-dot"></span>
+        <div>
+          <strong>Dados do projeto</strong>
+          <span id="data-status-text">Tentando carregar os arquivos gerados...</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <section id="inicio" class="hero section">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow red">AULA 02</span>
+          <h1>Do dado bruto à decisão</h1>
+          <p class="lead">
+            Nesta prática, vamos refazer em código o mesmo raciocínio que vimos no Orange Data Mining.
+            A diferença é que agora cada etapa estará explícita no Python: vamos selecionar, limpar,
+            transformar, treinar, avaliar e interpretar.
+          </p>
+
+          <div class="flow-inline" aria-label="Fluxo KDD">
+            <span>Seleção</span>
+            <i></i>
+            <span>Pré-processamento</span>
+            <i></i>
+            <span>Transformação</span>
+            <i></i>
+            <span>Mineração</span>
+            <i></i>
+            <span>Interpretação</span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#camadas">Começar pela estrutura dos dados</a>
+            <a class="btn btn-ghost" href="#kdd">Ir direto para o KDD</a>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="panel-title">O que vamos construir</div>
+          <div class="mini-architecture">
+            <div class="arch-box">
+              <span class="arch-label">ENTRADA</span>
+              <strong>CSV de inspeção</strong>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-box">
+              <span class="arch-label">PROCESSAMENTO</span>
+              <strong>Python + Pandas</strong>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-box">
+              <span class="arch-label">MODELO</span>
+              <strong>Árvore de decisão</strong>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-box">
+              <span class="arch-label">SAÍDA</span>
+              <strong>SQLite + Streamlit</strong>
+            </div>
+          </div>
+
+          <div class="live-metrics">
+            <div class="metric">
+              <span>Bronze</span>
+              <strong data-metric="bronze">99</strong>
+              <small>registros brutos</small>
+            </div>
+            <div class="metric">
+              <span>Prata</span>
+              <strong data-metric="prata">96</strong>
+              <small>registros tratados</small>
+            </div>
+            <div class="metric">
+              <span>Teste</span>
+              <strong data-metric="teste">24</strong>
+              <small>registros</small>
+            </div>
+            <div class="metric highlight">
+              <span>Acurácia</span>
+              <strong data-metric="acuracia">91,67%</strong>
+              <small>no conjunto de teste</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Ideia central:</strong>
+        o modelo é apenas uma parte do processo. Se os dados não forem preparados e se os resultados
+        não forem interpretados, ainda não temos uma solução de Inteligência Artificial útil.
+      </div>
+    </section>
+
+    <section id="camadas" class="section">
+      <div class="section-heading">
+        <span class="eyebrow red">01 | ORGANIZAÇÃO DOS DADOS</span>
+        <h2>Bronze, Prata e Ouro</h2>
+        <p>
+          Antes de olhar o algoritmo, precisamos entender como os dados percorrem o projeto.
+          Vamos usar três camadas para separar origem, tratamento e informação pronta para uso.
+        </p>
+      </div>
+
+      <div class="layer-switcher" role="tablist" aria-label="Camadas de dados">
+        <button class="layer-tab active" data-layer="bronze" type="button">BRONZE</button>
+        <button class="layer-tab" data-layer="prata" type="button">PRATA</button>
+        <button class="layer-tab" data-layer="ouro" type="button">OURO</button>
+      </div>
+
+      <div class="layer-stage">
+        <div class="layer-visual bronze active" data-layer-panel="bronze">
+          <div class="layer-number">01</div>
+          <div>
+            <span class="layer-kdd">KDD: Seleção</span>
+            <h3>O dado como chegou</h3>
+            <p>
+              A Bronze preserva o CSV original. Aqui ainda encontramos duplicidades, ausências,
+              grafias inconsistentes e valores suspeitos. Não queremos esconder esses problemas:
+              queremos registrar a origem antes de começar a corrigir.
+            </p>
+            <div class="layer-tags">
+              <span>99 registros</span>
+              <span>3 duplicidades</span>
+              <span>ausências</span>
+              <span>grafias variadas</span>
+            </div>
+            <code>bronze_qualidade_pecas</code>
+          </div>
+        </div>
+
+        <div class="layer-visual prata" data-layer-panel="prata">
+          <div class="layer-number">02</div>
+          <div>
+            <span class="layer-kdd">KDD: Pré-processamento</span>
+            <h3>O dado depois do tratamento</h3>
+            <p>
+              A Prata reúne os registros depois das nossas decisões de limpeza e padronização.
+              Removemos duplicidades, consolidamos categorias, validamos números e tratamos valores ausentes.
+            </p>
+            <div class="layer-tags">
+              <span>96 registros</span>
+              <span>0 duplicidades completas</span>
+              <span>categorias padronizadas</span>
+              <span>ausências tratadas</span>
+            </div>
+            <code>prata_qualidade_pecas</code>
+          </div>
+        </div>
+
+        <div class="layer-visual ouro" data-layer-panel="ouro">
+          <div class="layer-number">03</div>
+          <div>
+            <span class="layer-kdd">KDD: Interpretação</span>
+            <h3>Informação preparada para análise</h3>
+            <p>
+              A Ouro aproxima o resultado técnico da decisão. Aqui encontramos previsões,
+              métricas do modelo, importância dos atributos e indicadores de retrabalho.
+            </p>
+            <div class="layer-tags">
+              <span>métricas</span>
+              <span>previsões</span>
+              <span>indicadores</span>
+              <span>informação para decisão</span>
+            </div>
+            <code>ouro_metricas_modelo / ouro_indicadores_linha / ...</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="memory-line">
+        <div><strong>Bronze</strong><span>preserva</span></div>
+        <b></b>
+        <div><strong>Prata</strong><span>organiza</span></div>
+        <b></b>
+        <div><strong>Ouro</strong><span>responde</span></div>
+      </div>
+    </section>
+
+    <section id="ambiente" class="section soft">
+      <div class="section-heading">
+        <span class="eyebrow red">02 | PREPARAÇÃO</span>
+        <h2>Vamos colocar o projeto para funcionar</h2>
+        <p>
+          Vamos preparar o ambiente de forma reproduzível. O ponto mais importante é garantir que
+          o Python usado no terminal seja o Python do <code>.venv</code>.
+        </p>
+      </div>
+
+      <div class="steps-grid">
+        <article class="step-card">
+          <span class="step-number">1</span>
+          <h3>Conferir o Python</h3>
+          <p>Primeiro verificamos se o Python está disponível.</p>
+          <div class="command-row">
+            <code>python --version</code>
+            <button class="copy-btn" data-copy="python --version" type="button">Copiar</button>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">2</span>
+          <h3>Criar o ambiente virtual</h3>
+          <p>O ambiente virtual mantém as bibliotecas deste projeto isoladas.</p>
+          <div class="command-row">
+            <code>python -m venv .venv</code>
+            <button class="copy-btn" data-copy="python -m venv .venv" type="button">Copiar</button>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">3</span>
+          <h3>Ativar no CMD</h3>
+          <p>Quando funcionar, veremos <code>(.venv)</code> no início da linha.</p>
+          <div class="command-row">
+            <code>.venv\Scripts\activate.bat</code>
+            <button class="copy-btn" data-copy=".venv\Scripts\activate.bat" type="button">Copiar</button>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <span class="step-number">4</span>
+          <h3>Instalar dependências</h3>
+          <p>Instalamos Pandas, scikit-learn, Streamlit e demais bibliotecas.</p>
+          <div class="command-row">
+            <code>python -m pip install -r requirements.txt</code>
+            <button class="copy-btn" data-copy="python -m pip install -r requirements.txt" type="button">Copiar</button>
+          </div>
+        </article>
+      </div>
+
+      <div class="check-panel">
+        <div>
+          <strong>Checkpoint do ambiente</strong>
+          <p>Vamos confirmar que o ambiente virtual contém tudo o que precisamos.</p>
+        </div>
+        <div class="command-row wide">
+          <code>python -c "import pandas, sklearn, streamlit; print('Ambiente OK')"</code>
+          <button class="copy-btn" data-copy="python -c &quot;import pandas, sklearn, streamlit; print('Ambiente OK')&quot;" type="button">Copiar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="dataset" class="section">
+      <div class="section-heading">
+        <span class="eyebrow red">03 | SITUAÇÃO-PROBLEMA</span>
+        <h2>Antes do modelo, vamos conhecer os dados</h2>
+        <p>
+          Nosso dataset simula registros de inspeção de qualidade. O objetivo do modelo será distinguir
+          <strong>conforme</strong> de <strong>retrabalho</strong>.
+        </p>
+      </div>
+
+      <div class="dataset-layout">
+        <div class="schema-card">
+          <h3>O que cada coluna representa</h3>
+          <div class="schema-list" id="schema-list">
+            <button data-field="id_lote"><code>id_lote</code><span>identificador do lote</span></button>
+            <button data-field="linha"><code>linha</code><span>linha de produção</span></button>
+            <button data-field="turno"><code>turno</code><span>turno da produção</span></button>
+            <button data-field="fornecedor"><code>fornecedor</code><span>origem da matéria-prima</span></button>
+            <button data-field="temp_forno_c"><code>temp_forno_c</code><span>temperatura do forno</span></button>
+            <button data-field="tempo_ciclo_s"><code>tempo_ciclo_s</code><span>tempo de ciclo</span></button>
+            <button data-field="pressao_bar"><code>pressao_bar</code><span>pressão do processo</span></button>
+            <button data-field="umidade_pct"><code>umidade_pct</code><span>umidade</span></button>
+            <button data-field="resultado_inspecao"><code>resultado_inspecao</code><span>classe-alvo</span></button>
+          </div>
+        </div>
+
+        <div class="problem-lab">
+          <div class="problem-toolbar">
+            <div>
+              <span class="eyebrow">LABORATÓRIO DE QUALIDADE</span>
+              <h3>Encontre os problemas antes do algoritmo</h3>
+            </div>
+            <button class="btn btn-ghost small" id="reveal-problems" type="button">Mostrar problemas</button>
+          </div>
+
+          <div class="fake-table" id="fake-table">
+            <div class="fake-row header">
+              <span>linha</span><span>turno</span><span>fornecedor</span><span>temp_forno_c</span><span>tempo_ciclo_s</span>
+            </div>
+            <div class="fake-row">
+              <span class="issue-text">Linha C</span><span class="issue-text">manha</span><span class="issue-text">Forn B</span><span>189.1</span><span>49.7</span>
+            </div>
+            <div class="fake-row">
+              <span class="issue-text">linha c</span><span class="issue-text">TARDE</span><span class="issue-text">forn a</span><span>190.9</span><span>52.8</span>
+            </div>
+            <div class="fake-row">
+              <span>linha b</span><span>noite</span><span>Fornecedor A</span><span class="issue-value">310</span><span>45.2</span>
+            </div>
+            <div class="fake-row">
+              <span>linha a</span><span></span><span>fornecedor c</span><span>188.7</span><span class="issue-value">-12</span>
+            </div>
+          </div>
+
+          <div class="question-box">
+            <strong>Vamos pensar:</strong>
+            <p>
+              Quais desses valores descrevem o processo e quais descrevem um problema de qualidade do dado?
+              Antes de corrigir, precisamos saber o que cada valor significa.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="before-after">
+        <div class="comparison">
+          <span class="comparison-label">ANTES</span>
+          <div class="token-stack">
+            <span>Linha C</span><span>linha c</span><span>LINHA C</span>
+          </div>
+        </div>
+        <div class="transform-arrow">
+          <span>PADRONIZAÇÃO</span>
+          <i></i>
+        </div>
+        <div class="comparison after">
+          <span class="comparison-label">DEPOIS</span>
+          <div class="token-stack">
+            <span>linha c</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="kdd" class="section soft">
+      <div class="section-heading">
+        <span class="eyebrow red">04 | PIPELINE</span>
+        <h2>Vamos percorrer as cinco etapas do KDD</h2>
+        <p>
+          Clique em cada etapa. A ideia é relacionar o conceito do KDD com o trecho correspondente do código.
+        </p>
+      </div>
+
+      <div class="kdd-timeline" id="kdd-timeline">
+        <button class="kdd-node active" data-step="1" type="button">
+          <span>1</span>
+          <strong>Seleção</strong>
+          <small>Bronze</small>
+        </button>
+        <div class="kdd-line"></div>
+        <button class="kdd-node" data-step="2" type="button">
+          <span>2</span>
+          <strong>Pré-processamento</strong>
+          <small>Prata</small>
+        </button>
+        <div class="kdd-line"></div>
+        <button class="kdd-node" data-step="3" type="button">
+          <span>3</span>
+          <strong>Transformação</strong>
+          <small>X e y</small>
+        </button>
+        <div class="kdd-line"></div>
+        <button class="kdd-node" data-step="4" type="button">
+          <span>4</span>
+          <strong>Mineração</strong>
+          <small>Árvore</small>
+        </button>
+        <div class="kdd-line"></div>
+        <button class="kdd-node" data-step="5" type="button">
+          <span>5</span>
+          <strong>Interpretação</strong>
+          <small>Ouro</small>
+        </button>
+      </div>
+
+      <div class="kdd-detail" id="kdd-detail">
+        <div class="kdd-detail-text">
+          <span class="eyebrow">ETAPA 1</span>
+          <h3>Seleção: preservar a origem</h3>
+          <p>
+            Começamos lendo o CSV e salvando uma cópia lógica do dado bruto. Ainda não corrigimos nada:
+            primeiro preservamos a origem.
+          </p>
+          <ul>
+            <li>Leitura com <code>pd.read_csv()</code></li>
+            <li>Contagem de ausências e duplicidades</li>
+            <li>Persistência em <code>bronze_qualidade_pecas</code></li>
+          </ul>
+        </div>
+        <pre class="code-block"><code id="kdd-code">bronze = pd.read_csv(RAW_PATH)
+salvar_tabela(
+    bronze,
+    "bronze_qualidade_pecas",
+    conn
+)</code></pre>
+      </div>
+
+      <div class="run-panel">
+        <div>
+          <span class="eyebrow">EXECUÇÃO</span>
+          <h3>Agora vamos rodar o pipeline completo</h3>
+          <p>
+            Primeiro observamos tudo funcionando. Depois voltamos ao código para entender cada bloco.
+          </p>
+        </div>
+        <div class="command-row">
+          <code>python src\pipeline_qualidade.py</code>
+          <button class="copy-btn" data-copy="python src\pipeline_qualidade.py" type="button">Copiar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="modelo" class="section">
+      <div class="section-heading">
+        <span class="eyebrow red">05 | TRANSFORMAÇÃO E MODELO</span>
+        <h2>Como os dados chegam até a árvore</h2>
+        <p>
+          Antes do <code>fit()</code>, precisamos separar entrada e resposta, converter categorias e dividir treino e teste.
+        </p>
+      </div>
+
+      <div class="xy-lab">
+        <div class="xy-card">
+          <span class="xy-label">X</span>
+          <h3>Atributos de entrada</h3>
+          <p>Características que o modelo poderá utilizar para aprender.</p>
+          <div class="chip-list">
+            <span>temp_forno_c</span>
+            <span>tempo_ciclo_s</span>
+            <span>pressao_bar</span>
+            <span>umidade_pct</span>
+            <span>linha</span>
+            <span>turno</span>
+            <span>fornecedor</span>
+          </div>
+        </div>
+
+        <div class="xy-card target">
+          <span class="xy-label">y</span>
+          <h3>Resposta conhecida</h3>
+          <p>É aquilo que queremos que o modelo aprenda a prever.</p>
+          <div class="mapping">
+            <div><span>conforme</span><strong>0</strong></div>
+            <div><span>retrabalho</span><strong>1</strong></div>
+          </div>
+        </div>
+
+        <div class="xy-card muted-card">
+          <span class="xy-label">META</span>
+          <h3>id_lote</h3>
+          <p>
+            Continua sendo útil para rastrear cada registro, mas não descreve o processo.
+            Por isso, não deve ensinar o modelo.
+          </p>
+        </div>
+      </div>
+
+      <div class="encoding-lab">
+        <div>
+          <span class="eyebrow">TRANSFORMAÇÃO DE CATEGORIAS</span>
+          <h3>Vamos visualizar o one-hot encoding</h3>
+          <p>Escolha uma linha de produção para observar como o texto vira colunas numéricas.</p>
+          <div class="segmented" id="line-selector">
+            <button class="active" data-line="a" type="button">linha a</button>
+            <button data-line="b" type="button">linha b</button>
+            <button data-line="c" type="button">linha c</button>
+          </div>
+        </div>
+        <div class="binary-grid">
+          <div><span>linha_linha a</span><strong id="bin-a">1</strong></div>
+          <div><span>linha_linha b</span><strong id="bin-b">0</strong></div>
+          <div><span>linha_linha c</span><strong id="bin-c">0</strong></div>
+        </div>
+      </div>
+
+      <div class="split-lab">
+        <div class="split-copy">
+          <span class="eyebrow">TREINO E TESTE</span>
+          <h3>96 registros não têm a mesma função</h3>
+          <p>
+            Usamos 72 para o aprendizado e reservamos 24 para avaliar o comportamento do modelo
+            em registros separados do treinamento.
+          </p>
+        </div>
+        <div class="split-bar">
+          <div class="train" style="width:75%">
+            <strong>72</strong>
+            <span>treino | 75%</span>
+          </div>
+          <div class="test" style="width:25%">
+            <strong>24</strong>
+            <span>teste | 25%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div>
+          <span class="eyebrow">MINERAÇÃO</span>
+          <h3>Aqui o algoritmo aprende</h3>
+          <p>
+            No Orange utilizamos o widget <strong>Tree</strong>. Agora fazemos a mesma etapa diretamente por código.
+            Nós não escrevemos manualmente as regras de classificação.
+          </p>
+        </div>
+        <pre class="code-block"><code>modelo = DecisionTreeClassifier(
+    max_depth=3,
+    random_state=42
+)
+
+modelo.fit(X_train, y_train)</code></pre>
+      </div>
+    </section>
+
+    <section id="matriz" class="section soft">
+      <div class="section-heading">
+        <span class="eyebrow red">06 | AVALIAÇÃO</span>
+        <h2>Acurácia é só o começo</h2>
+        <p>
+          O modelo acertou 22 de 24 registros no conjunto de teste. Isso produz aproximadamente 91,67% de acurácia.
+          Agora precisamos entender como aconteceram os dois erros.
+        </p>
+      </div>
+
+      <div class="accuracy-card">
+        <div class="gauge" id="accuracy-gauge" style="--value:91.67">
+          <div>
+            <strong data-metric="acuracia">91,67%</strong>
+            <span>acurácia</span>
+          </div>
+        </div>
+        <div>
+          <h3>22 previsões corretas em 24</h3>
+          <p>
+            A acurácia responde <strong>quanto</strong> o modelo acertou. A matriz de confusão nos ajuda a entender
+            <strong>como</strong> ele acertou e errou.
+          </p>
+        </div>
+      </div>
+
+      <div class="matrix-wrap">
+        <div class="matrix-axis top">PREVISTO PELO MODELO</div>
+        <div class="matrix-axis left">SITUAÇÃO REAL</div>
+
+        <div class="confusion-matrix" id="confusion-matrix">
+          <div class="matrix-corner"></div>
+          <div class="matrix-head">Conforme</div>
+          <div class="matrix-head">Retrabalho</div>
+
+          <div class="matrix-head row">Conforme</div>
+          <button class="matrix-cell good" data-matrix="tn" type="button">
+            <strong data-metric="tn">15</strong>
+            <span>acerto</span>
+          </button>
+          <button class="matrix-cell warning" data-matrix="fp" type="button">
+            <strong data-metric="fp">1</strong>
+            <span>falso positivo</span>
+          </button>
+
+          <div class="matrix-head row">Retrabalho</div>
+          <button class="matrix-cell danger" data-matrix="fn" type="button">
+            <strong data-metric="fn">1</strong>
+            <span>falso negativo</span>
+          </button>
+          <button class="matrix-cell good" data-matrix="tp" type="button">
+            <strong data-metric="tp">7</strong>
+            <span>acerto</span>
+          </button>
+        </div>
+
+        <div class="matrix-explanation" id="matrix-explanation">
+          <span class="eyebrow">CLIQUE EM UMA CÉLULA</span>
+          <h3>Vamos interpretar a matriz</h3>
+          <p>
+            Cada célula representa uma combinação entre o que realmente aconteceu e o que o modelo previu.
+          </p>
+        </div>
+      </div>
+
+      <div class="error-comparison">
+        <article>
+          <span class="error-type">FALSO POSITIVO</span>
+          <h3>Conforme → Retrabalho</h3>
+          <p>Uma peça boa poderia ser enviada para retrabalho ou inspeção adicional.</p>
+          <ul>
+            <li>custo adicional</li>
+            <li>perda de tempo</li>
+            <li>retrabalho desnecessário</li>
+          </ul>
+        </article>
+        <article class="critical">
+          <span class="error-type">FALSO NEGATIVO</span>
+          <h3>Retrabalho → Conforme</h3>
+          <p>Uma peça que precisava de correção poderia seguir adiante como se estivesse conforme.</p>
+          <ul>
+            <li>problema não tratado</li>
+            <li>risco de propagação no processo</li>
+            <li>impacto potencialmente maior</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="ouro" class="section">
+      <div class="section-heading">
+        <span class="eyebrow red">07 | INTERPRETAÇÃO E OURO</span>
+        <h2>Transformando saída técnica em informação</h2>
+        <p>
+          Agora vamos observar o que a árvore utilizou e quais indicadores o projeto disponibiliza para novas análises.
+        </p>
+      </div>
+
+      <div class="charts-grid">
+        <article class="chart-card">
+          <div class="chart-title">
+            <span class="eyebrow">IMPORTÂNCIA NA ÁRVORE</span>
+            <h3>Atributos usados nas divisões</h3>
+          </div>
+          <div class="bar-chart" id="feature-chart" aria-label="Importância dos atributos">
+            <div class="bar-row">
+              <span>tempo_ciclo_s</span>
+              <div><i style="width:53.5%"></i></div>
+              <strong>53,5%</strong>
+            </div>
+            <div class="bar-row">
+              <span>temp_forno_c</span>
+              <div><i style="width:27.6%"></i></div>
+              <strong>27,6%</strong>
+            </div>
+            <div class="bar-row">
+              <span>pressao_bar</span>
+              <div><i style="width:18.9%"></i></div>
+              <strong>18,9%</strong>
+            </div>
+          </div>
+          <div class="chart-note">
+            Importância não significa causalidade. Ela descreve como esta árvore utilizou os atributos neste experimento.
+          </div>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-title">
+            <span class="eyebrow">INDICADOR DE PROCESSO</span>
+            <h3>Taxa de retrabalho por linha</h3>
+          </div>
+          <div class="column-chart" id="line-chart" aria-label="Taxa de retrabalho por linha">
+            <div class="column" data-label="Linha A">
+              <strong>19,4%</strong>
+              <i style="height:38.8%"></i>
+              <span>Linha A</span>
+            </div>
+            <div class="column" data-label="Linha B">
+              <strong>32,0%</strong>
+              <i style="height:64%"></i>
+              <span>Linha B</span>
+            </div>
+            <div class="column emphasis" data-label="Linha C">
+              <strong>50,0%</strong>
+              <i style="height:100%"></i>
+              <span>Linha C</span>
+            </div>
+          </div>
+          <div class="chart-note">
+            Podemos dizer que a Linha C apresentou maior retrabalho neste conjunto. Isso não prova que a linha seja a causa.
+          </div>
+        </article>
+      </div>
+
+      <div class="causality-lab">
+        <div>
+          <span class="eyebrow">ASSOCIAÇÃO NÃO É CAUSALIDADE</span>
+          <h3>O resultado nos mostra onde investigar</h3>
+          <p>
+            Se a Linha C apresenta maior retrabalho, nossa próxima etapa é formular hipóteses e buscar novas evidências.
+          </p>
+        </div>
+        <div class="investigation-path">
+          <span>Maior retrabalho na Linha C</span>
+          <i></i>
+          <span>Investigar parâmetros</span>
+          <i></i>
+          <div class="investigation-options">
+            <b>temperatura</b>
+            <b>tempo de ciclo</b>
+            <b>pressão</b>
+            <b>fornecedor</b>
+            <b>turno</b>
+            <b>manutenção</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="gold-output">
+        <h3>O que a camada Ouro entrega</h3>
+        <div class="gold-grid">
+          <div><code>ouro_lotes_qualidade</code><span>base refinada de lotes</span></div>
+          <div><code>ouro_indicadores_linha</code><span>indicadores por linha</span></div>
+          <div><code>ouro_resultado_teste</code><span>real x previsto</span></div>
+          <div><code>ouro_metricas_modelo</code><span>acurácia e erros</span></div>
+          <div><code>ouro_importancia_atributos</code><span>uso dos atributos na árvore</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="desafio" class="section dark-section">
+      <div class="section-heading light">
+        <span class="eyebrow">08 | CONSOLIDAÇÃO</span>
+        <h2>Vamos fechar o ciclo completo</h2>
+        <p>
+          Agora já conseguimos relacionar o dado bruto, o tratamento, o treinamento e a interpretação.
+        </p>
+      </div>
+
+      <div class="final-flow">
+        <span>Dado bruto</span><i></i>
+        <span>Bronze</span><i></i>
+        <span>Prata</span><i></i>
+        <span>Transformação</span><i></i>
+        <span>Modelo</span><i></i>
+        <span>Avaliação</span><i></i>
+        <span>Ouro</span>
+      </div>
+
+      <div class="challenge-grid">
+        <article class="challenge-card">
+          <span class="eyebrow">REGISTRO FINAL</span>
+          <h3>Vamos sintetizar a prática</h3>
+          <ol>
+            <li>Quais problemas encontramos no dado bruto?</li>
+            <li>O que mudou para formarmos a Prata?</li>
+            <li>Por que <code>id_lote</code> não entrou como atributo preditivo?</li>
+            <li>Qual foi a acurácia?</li>
+            <li>Quantos falsos positivos e falsos negativos tivemos?</li>
+            <li>Qual erro teria maior impacto neste cenário?</li>
+            <li>Qual decisão de pré-processamento exigiria validação do processo real?</li>
+          </ol>
+        </article>
+
+        <article class="challenge-card">
+          <span class="eyebrow">DESAFIO EXTRA</span>
+          <h3>Vamos alterar a profundidade da árvore</h3>
+          <div class="depth-control">
+            <label for="depth-slider">max_depth = <strong id="depth-value">3</strong></label>
+            <input id="depth-slider" type="range" min="2" max="5" step="1" value="3">
+          </div>
+          <p id="depth-description">
+            Profundidade 3: configuração usada no experimento principal. Equilibra simplicidade e capacidade de separar padrões.
+          </p>
+          <div class="command-row">
+            <code>python src\pipeline_qualidade.py</code>
+            <button class="copy-btn" data-copy="python src\pipeline_qualidade.py" type="button">Copiar</button>
+          </div>
+          <small>
+            O controle acima é conceitual. Para testar de verdade, alteramos <code>max_depth</code> no Python,
+            executamos novamente e comparamos acurácia, matriz e regras.
+          </small>
+        </article>
+      </div>
+
+      <div class="next-step">
+        <span>Na aula anterior visualizamos o processo com widgets.</span>
+        <strong>Agora implementamos o mesmo raciocínio diretamente em código.</strong>
+        <span>O próximo passo será aprofundar os modelos de Inteligência Artificial.</span>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        <strong>SENAI-SP</strong>
+        <span>Aplicações em Inteligência Artificial | Aula 02</span>
+      </div>
+      <span>Guia interativo do projeto KDD e Pipeline de Dados</span>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Comando copiado</div>
+
+  <script src="guia_kdd.js"></script>
+</body>
+</html>
