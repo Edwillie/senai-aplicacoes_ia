@@ -1,0 +1,7 @@
+# Requer Python 3.10, 3.11 ou 3.12
+# Veja LEIA-ME_AMBIENTE.md antes de instalar.
+pandas>=2.2,<3
+numpy>=1.26,<2
+scikit-learn>=1.5,<2
+streamlit>=1.40,<2
+tensorflow==2.17.0
