@@ -1,0 +1,4 @@
+﻿modelo,acuracia,falso_positivo,falso_negativo,recall_falha
+MLP scikit-learn,0.9768,17,41,0.5176470588235295
+MLP TensorFlow/Keras,0.9748,28,35,0.5882352941176471
+Árvore de Decisão,0.9256,178,8,0.9058823529411765
