@@ -285,7 +285,7 @@ def treinar_mlp_keras(X_train_scaled, X_test_scaled, y_train):
         X_train_scaled,
         y_train.to_numpy(),
         validation_split=0.20,
-        epochs=200,
+        epochs=50,
         batch_size=32,
         callbacks=[early_stopping],
         verbose=0,
