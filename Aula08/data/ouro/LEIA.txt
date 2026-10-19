@@ -1,0 +1,1 @@
+Base final ocorrencias.db (camada Ouro, SQLite). Criada automaticamente pela aplicação.

@@ -1,0 +1,19 @@
+AULA DEEP VOICE - CENTRAL DE VOZ DA USINAGEM
+============================================
+O passo a passo completo está no arquivo Aula_DeepVoice_Passo_a_Passo.docx.
+
+Resumo (Prompt de Comando, dentro de C:\aulas\aula_deepvoice):
+
+  py -3.12 -m venv .venv
+  .venv\Scripts\activate
+  python --version                          (tem que ser 3.12.x)
+  python -m pip install --upgrade pip
+  python -m pip install -r requirements.txt
+  python baixar_modelos.py
+  python testar_ambiente.py
+  python -m streamlit run app_streamlit.py
+
+Na próxima vez:
+  cd C:\aulas\aula_deepvoice
+  .venv\Scripts\activate
+  python -m streamlit run app_streamlit.py

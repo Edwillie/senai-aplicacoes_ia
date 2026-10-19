@@ -1,0 +1,1 @@
+Modelos de IA. Rode: python baixar_modelos.py  (ou copie aqui a pasta 'modelos' fornecida pelo professor).
